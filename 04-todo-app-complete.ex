@@ -1,10 +1,13 @@
 defmodule Todo do
   def start do
-    load_csv()
+    if askUser("Would you like to create a new Todo-List? (y/n) ") == "y" do
+      create_initial_todo() |> get_command
+    else
+      load_csv()
+    end
   end
 
   def get_command(data) do
-    data
     command = askUser("Please choose:     R)ead Todos     A)dd todo     D)elete todo     L)oad csv      S)save csv     Q)uit: ")
     case String.downcase(command) do
       "r" -> show_todos(data)
@@ -24,6 +27,26 @@ defmodule Todo do
     new_todo = %{name => Enum.into(fields, %{})}
     new_data = Map.merge(data, new_todo)
     get_command(new_data)
+  end
+
+  def create_header(headers) do
+    case askUser("Add field: ") do
+      "" -> headers
+      header -> create_header([header | headers])
+    end
+  end
+
+  def create_headers() do
+    IO.puts "What data should each todo have - please put in the headers one by one and an empty line when you are done.\n"
+    create_header([])
+  end
+
+  def create_initial_todo do
+    titles = create_headers()
+    name = get_item_name(%{})
+    fields = Enum.map(titles, &field_from_user(&1))
+    IO.puts "New todo #{name} added."
+    %{name => Enum.into(fields, %{})}
   end
 
   def get_item_name(data) do
@@ -83,8 +106,12 @@ defmodule Todo do
 
   def save_csv(data) do
     filename = askUser("Name of csv to save to: ")
-    filedata = prepare_scv_to_save(data)
-
+    filedata = prepare_csv_to_save(data)
+    case File.write(filename, filedata) do
+      :ok              -> IO.puts "Todo-List saved to #{filename}."
+      {:error, reason} -> IO.puts ~s{Could not save to "#{filename}", reason: #{:file.format_error reason}\n}
+    end
+    get_command(data)
   end
 
   def read(filename) do
