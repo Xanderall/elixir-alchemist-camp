@@ -6,7 +6,7 @@ defmodule BMP do
 # try generate_file()
 
   def generate_file(width \\ 30, height \\ 47, name \\ "12-generated-pic.bmp") do
-    save(name, win2x_header(width, height), generate_example_data(width, height))
+    save(name, file_header() <> win2x_header(width, height), generate_example_data(width, height))
   end
 
 # BMP file Header
@@ -53,13 +53,20 @@ defmodule BMP do
         bytes_past = rem(3 * width, 4)
         padding = (4 - bytes_past) * 8
         for item <- 1..width, into: <<>> do
-            <<(100 + 5 * item)::little-8, (2 * row)::little-8, (5 * item + row)::little-8>> # blue, green, red
+          pixel(100 + 5 * item, 2 * row, 5 * item + row)
         end <> <<0::size(padding)>>
     end
   end
 
-  def save(filename, bmp_header, pixels) do
-    File.write!(filename, file_header() <> bmp_header <> pixels)
+  def pixel(blue, green, red) do
+    <<blue::little-8, green::little-8, red::little-8>>
   end
 
+  def save(filename, header, pixels) do
+    File.write!(filename, header <> pixels)
+  end
+
+  def win2x_palette do
+    
+  end
 end
