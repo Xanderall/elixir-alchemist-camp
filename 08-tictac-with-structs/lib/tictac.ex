@@ -25,4 +25,11 @@ defmodule Tictac do
       :empty -> {:ok, %{board | place => player }}
     end
   end
+
+  def play_at(board, col, row, player) do
+    with {:ok, valid_player} <- check_player(player),
+         {:ok, square}       <- Square.new(col, row),
+         {:ok, new_board}    <- place_piece(board, square, valid_player),
+    do: new_board
+  end
 end
