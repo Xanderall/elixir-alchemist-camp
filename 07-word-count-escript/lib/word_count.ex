@@ -1,7 +1,7 @@
 defmodule WordCount do
 
   def start(parsed, file, invalid) do
-    if (invalid != []) || (file == "h") do
+    if invalid != [] || file == ["h"] || file == [] do
       show_help()
     else
       read_file(parsed, file)
@@ -32,7 +32,7 @@ E.g.: somefile.txt -lc
     words = fileContent
       |> String.split(~r{(\\n|[^\w'])+})
       |> Enum.filter(fn x -> x != "" end)
-    chars = String.to_charlist(fileContent)
+    chars = String.split(fileContent, "") |> Enum.filter(fn x -> x != "" end)
     lines = String.split(fileContent,~r{(\r\n|\n|\r)})
 
     # Display results
