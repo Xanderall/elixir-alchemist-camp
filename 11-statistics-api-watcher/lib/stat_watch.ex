@@ -1,9 +1,14 @@
 defmodule StatWatch do
 
+  def run do
+    festch_stats()
+      |> save_csv
+  end
+
   def stats_url do
     youtube_api_v3 = "https://www.googleapis.com/youtube/v3/"
-    channel = "id=" <> ""
-    key = "key=" <> ""
+    channel = "id=" # put your channel here
+    key = "key=" # put your key here
     "#{youtube_api_v3}channels?#{channel}#{key}&part=statistics"
   end
   
